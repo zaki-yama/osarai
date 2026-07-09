@@ -1,0 +1,23 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "osarai",
+	"main": "./src/worker/index.ts",
+	"compatibility_date": "2025-10-08",
+	"compatibility_flags": ["nodejs_compat"],
+	"observability": {
+		"enabled": true
+	},
+	"upload_source_maps": true,
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "osarai",
+			"database_id": "ca626099-940c-4d3d-96cc-4b78512b3d9e",
+			"migrations_dir": "migrations"
+		}
+	],
+	"assets": {
+		"directory": "./dist/client",
+		"not_found_handling": "single-page-application"
+	}
+}
