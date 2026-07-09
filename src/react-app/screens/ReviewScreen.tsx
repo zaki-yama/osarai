@@ -9,7 +9,7 @@ export function ReviewScreen({ onReviewed }: { onReviewed: () => void }) {
 	const [queue, setQueue] = useState<Sentence[]>([]);
 	const [index, setIndex] = useState(0);
 	const [phase, setPhase] = useState<Phase>("loading");
-	const [typed, setTyped] = useState("");
+	const [answer, setAnswer] = useState("");
 	const [useKeyboard, setUseKeyboard] = useState(false);
 	const [result, setResult] = useState<JudgeResult | null>(null);
 	const [error, setError] = useState<string | null>(null);
@@ -35,8 +35,13 @@ export function ReviewScreen({ onReviewed }: { onReviewed: () => void }) {
 		void loadQueue();
 	}, [loadQueue]);
 
+	// 音声認識の結果を answer に反映する。停止後はキーボードで自由に修正できる
+	const { transcript } = speech;
+	useEffect(() => {
+		if (transcript) setAnswer(transcript);
+	}, [transcript]);
+
 	const current: Sentence | undefined = queue[index];
-	const answer = useKeyboard ? typed : speech.transcript;
 
 	const handleJudge = async () => {
 		if (!current || !answer.trim()) return;
@@ -56,7 +61,7 @@ export function ReviewScreen({ onReviewed }: { onReviewed: () => void }) {
 
 	const handleNext = () => {
 		setResult(null);
-		setTyped("");
+		setAnswer("");
 		speech.reset();
 		if (index + 1 < queue.length) {
 			setIndex(index + 1);
@@ -198,8 +203,8 @@ export function ReviewScreen({ onReviewed }: { onReviewed: () => void }) {
 							id="answer-input"
 							name="answer"
 							className="en-input"
-							value={typed}
-							onChange={(e) => setTyped(e.target.value)}
+							value={answer}
+							onChange={(e) => setAnswer(e.target.value)}
 							placeholder="英語で入力してください"
 							rows={2}
 						/>
@@ -235,10 +240,21 @@ export function ReviewScreen({ onReviewed }: { onReviewed: () => void }) {
 							<p className="mic-hint">
 								{speech.listening
 									? "聞いています… もう一度タップで停止"
-									: "タップして英語で話してください"}
+									: answer
+										? "テキストをタップすると修正できます"
+										: "タップして英語で話してください"}
 							</p>
-							{speech.transcript && (
-								<p className="transcript">{speech.transcript}</p>
+							{answer && (
+								<textarea
+									id="answer-input"
+									name="answer"
+									className="en-input transcript-input"
+									value={answer}
+									onChange={(e) => setAnswer(e.target.value)}
+									readOnly={speech.listening}
+									rows={2}
+									aria-label="認識結果(修正できます)"
+								/>
 							)}
 							{speech.error && <p className="error-note">{speech.error}</p>}
 							{!speech.supported && (
@@ -266,7 +282,6 @@ export function ReviewScreen({ onReviewed }: { onReviewed: () => void }) {
 						onClick={() => {
 							setUseKeyboard(!useKeyboard);
 							speech.reset();
-							setTyped("");
 						}}
 					>
 						{useKeyboard ? "マイクで話す" : "キーボードで入力する"}

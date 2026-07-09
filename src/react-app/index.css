@@ -550,16 +550,15 @@ input {
 	color: var(--ink-soft);
 }
 
-.transcript {
-	font-family: var(--font-en);
+.transcript-input {
 	font-size: 18px;
 	line-height: 1.6;
 	text-align: center;
-	padding: 10px 14px;
-	background: var(--card);
-	border: 1.5px dashed var(--line);
-	border-radius: var(--radius);
-	width: 100%;
+	border-style: dashed;
+}
+
+.transcript-input:read-only {
+	color: var(--ink-soft);
 }
 
 .link-btn {
