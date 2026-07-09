@@ -129,6 +129,51 @@ app.post("/api/review/:id/judge", async (c) => {
 	return c.json({ ...result, sentence: updated });
 });
 
+app.get("/api/stats", async (c) => {
+	const [totals, reviewTotals, activeDays, daily] = await Promise.all([
+		c.env.DB.prepare(
+			"SELECT COUNT(*) AS total, SUM(CASE WHEN streak >= 3 THEN 1 ELSE 0 END) AS mastered FROM sentences",
+		).first<{ total: number; mastered: number | null }>(),
+		c.env.DB.prepare(
+			"SELECT COUNT(*) AS total, SUM(correct) AS correct FROM reviews",
+		).first<{ total: number; correct: number | null }>(),
+		// Days (in JST) that have at least one review, newest first.
+		c.env.DB.prepare(
+			"SELECT DISTINCT date(reviewed_at, '+9 hours') AS day FROM reviews ORDER BY day DESC LIMIT 366",
+		).all<{ day: string }>(),
+		c.env.DB.prepare(
+			`SELECT date(reviewed_at, '+9 hours') AS day,
+			        COUNT(*) AS total, SUM(correct) AS correct
+			 FROM reviews
+			 WHERE reviewed_at >= datetime('now', '-14 days')
+			 GROUP BY day ORDER BY day ASC`,
+		).all<{ day: string; total: number; correct: number }>(),
+	]);
+
+	// Consecutive study days ending today or yesterday (JST).
+	const days = new Set(activeDays.results.map((r) => r.day));
+	const jstNow = new Date(Date.now() + 9 * 3600_000);
+	const cursor = new Date(jstNow);
+	const toKey = (d: Date) => d.toISOString().slice(0, 10);
+	let studyStreak = 0;
+	if (!days.has(toKey(cursor))) {
+		cursor.setUTCDate(cursor.getUTCDate() - 1); // today not studied yet — count from yesterday
+	}
+	while (days.has(toKey(cursor))) {
+		studyStreak++;
+		cursor.setUTCDate(cursor.getUTCDate() - 1);
+	}
+
+	return c.json({
+		sentences: totals?.total ?? 0,
+		mastered: totals?.mastered ?? 0,
+		reviews: reviewTotals?.total ?? 0,
+		correct: reviewTotals?.correct ?? 0,
+		studyStreak,
+		daily: daily.results,
+	});
+});
+
 app.get("/api/push/public-key", (c) =>
 	c.json({ key: c.env.VAPID_PUBLIC_KEY }),
 );

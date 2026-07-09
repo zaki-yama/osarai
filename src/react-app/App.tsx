@@ -9,9 +9,10 @@ import {
 import { RegisterScreen } from "./screens/RegisterScreen";
 import { ListScreen } from "./screens/ListScreen";
 import { ReviewScreen } from "./screens/ReviewScreen";
+import { StatsScreen } from "./screens/StatsScreen";
 import type { Sentence } from "../shared/types";
 
-type Tab = "register" | "list" | "review";
+type Tab = "register" | "list" | "review" | "stats";
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
 	{
@@ -60,6 +61,21 @@ const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
 				/>
 				<path
 					d="M12 8v4.5l3 2"
+					fill="none"
+					stroke="currentColor"
+					strokeWidth="1.8"
+					strokeLinecap="round"
+				/>
+			</svg>
+		),
+	},
+	{
+		id: "stats",
+		label: "きろく",
+		icon: (
+			<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+				<path
+					d="M5 19V13M10.5 19V5M16 19v-8M21 19H3"
 					fill="none"
 					stroke="currentColor"
 					strokeWidth="1.8"
@@ -180,6 +196,7 @@ function App() {
 					/>
 				)}
 				{tab === "review" && <ReviewScreen onReviewed={() => void refresh()} />}
+				{tab === "stats" && <StatsScreen />}
 			</main>
 
 			<nav className="tab-bar">

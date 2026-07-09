@@ -4,6 +4,15 @@ export interface Suggestion {
 	explanation: string;
 }
 
+export interface Stats {
+	sentences: number;
+	mastered: number;
+	reviews: number;
+	correct: number;
+	studyStreak: number;
+	daily: { day: string; total: number; correct: number }[];
+}
+
 export interface JudgeResult {
 	correct: boolean;
 	comment: string;

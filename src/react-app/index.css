@@ -670,3 +670,86 @@ input {
 	color: var(--shu);
 	margin-right: 4px;
 }
+
+/* ---- Stats ---- */
+
+.stats-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+}
+
+.stat-tile {
+	padding: 16px 14px 12px;
+	background: var(--card);
+	border: 1.5px solid var(--line);
+	border-radius: var(--radius);
+	text-align: center;
+}
+
+.stat-value {
+	font-size: 30px;
+	font-weight: 600;
+	line-height: 1.2;
+}
+
+.stat-unit {
+	font-size: 14px;
+	font-weight: 400;
+	color: var(--ink-soft);
+	margin-left: 2px;
+}
+
+.stat-caption {
+	font-size: 12px;
+	color: var(--ink-soft);
+	margin-top: 2px;
+}
+
+.chart-card {
+	padding: 16px 14px;
+	background: var(--card);
+	border: 1.5px solid var(--line);
+	border-radius: var(--radius);
+}
+
+.chart-title {
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--ink-soft);
+	margin-bottom: 12px;
+}
+
+.chart-wrap {
+	position: relative;
+}
+
+.chart-svg {
+	width: 100%;
+	height: auto;
+	display: block;
+	touch-action: manipulation;
+}
+
+.chart-tooltip {
+	position: absolute;
+	top: -6px;
+	right: 0;
+	font-size: 12px;
+	color: var(--ink);
+	background: var(--paper-deep);
+	padding: 2px 10px;
+	border-radius: 8px;
+}
+
+.chart-value-label {
+	font-size: 10px;
+	fill: var(--ink);
+	font-family: var(--font-ui);
+}
+
+.chart-axis-label {
+	font-size: 9px;
+	fill: var(--ink-soft);
+	font-family: var(--font-ui);
+}

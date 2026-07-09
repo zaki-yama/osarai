@@ -1,4 +1,4 @@
-import type { JudgeResult, Sentence, Suggestion } from "../shared/types";
+import type { JudgeResult, Sentence, Stats, Suggestion } from "../shared/types";
 
 /** D1 stores UTC "YYYY-MM-DD HH:MM:SS" */
 export function parseSqliteDate(sqlite: string): Date {
@@ -49,6 +49,7 @@ export const api = {
 	deleteSentence: (id: number) =>
 		request<{ ok: boolean }>(`/api/sentences/${id}`, { method: "DELETE" }),
 	reviewQueue: () => request<{ sentences: Sentence[] }>("/api/review/queue"),
+	stats: () => request<Stats>("/api/stats"),
 	judge: (id: number, answer: string) =>
 		request<JudgeResult & { sentence: Sentence }>(`/api/review/${id}/judge`, {
 			method: "POST",
