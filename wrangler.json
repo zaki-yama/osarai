@@ -8,6 +8,9 @@
 		"enabled": true
 	},
 	"upload_source_maps": true,
+	"vars": {
+		"GEMINI_MODEL": "gemini-2.5-flash"
+	},
 	"d1_databases": [
 		{
 			"binding": "DB",
