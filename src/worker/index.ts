@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { judgeAnswer, suggestTranslations } from "./gemini";
+import { sendPushToAll, sendReviewReminder } from "./push";
 import { nextSrsState } from "./srs";
 import type { JudgeResult, Sentence } from "../shared/types";
 
@@ -128,4 +129,60 @@ app.post("/api/review/:id/judge", async (c) => {
 	return c.json({ ...result, sentence: updated });
 });
 
-export default app;
+app.get("/api/push/public-key", (c) =>
+	c.json({ key: c.env.VAPID_PUBLIC_KEY }),
+);
+
+app.post("/api/push/subscribe", async (c) => {
+	const subscription = await c.req.json<{ endpoint?: string }>().catch(() => null);
+	if (!subscription?.endpoint) {
+		return c.json({ error: "invalid subscription" }, 400);
+	}
+	await c.env.DB.prepare(
+		"DELETE FROM push_subscriptions WHERE json_extract(subscription, '$.endpoint') = ?",
+	)
+		.bind(subscription.endpoint)
+		.run();
+	await c.env.DB.prepare(
+		"INSERT INTO push_subscriptions (subscription) VALUES (?)",
+	)
+		.bind(JSON.stringify(subscription))
+		.run();
+	return c.json({ ok: true }, 201);
+});
+
+app.post("/api/push/unsubscribe", async (c) => {
+	const body = await c.req.json<{ endpoint?: string }>().catch(() => null);
+	if (!body?.endpoint) {
+		return c.json({ error: "endpoint is required" }, 400);
+	}
+	await c.env.DB.prepare(
+		"DELETE FROM push_subscriptions WHERE json_extract(subscription, '$.endpoint') = ?",
+	)
+		.bind(body.endpoint)
+		.run();
+	return c.json({ ok: true });
+});
+
+app.post("/api/push/test", async (c) => {
+	const results = await sendPushToAll(c.env, {
+		data: JSON.stringify({
+			title: "osarai",
+			body: "テスト通知です。通知の設定は完了しています!",
+		}),
+		options: { ttl: 60 * 5, urgency: "high" },
+	});
+	return c.json({ results });
+});
+
+export default {
+	fetch: app.fetch,
+	scheduled: async (_controller, env) => {
+		try {
+			await sendReviewReminder(env);
+		} catch (e) {
+			console.error("scheduled failed:", e);
+			throw e;
+		}
+	},
+} satisfies ExportedHandler<Env>;

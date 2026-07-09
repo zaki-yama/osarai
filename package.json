@@ -2,6 +2,7 @@
 	"name": "osarai",
 	"description": "English conversation review app with spaced repetition",
 	"dependencies": {
+		"@block65/webcrypto-web-push": "^1.0.2",
 		"hono": "4.11.1",
 		"react": "19.2.1",
 		"react-dom": "19.2.1"

@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { api, parseSqliteDate } from "./api";
+import {
+	getSubscription,
+	pushSupported,
+	subscribePush,
+	unsubscribePush,
+} from "./push";
 import { RegisterScreen } from "./screens/RegisterScreen";
 import { ListScreen } from "./screens/ListScreen";
 import { ReviewScreen } from "./screens/ReviewScreen";
@@ -64,6 +70,66 @@ const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
 	},
 ];
 
+function NotificationBell() {
+	const [state, setState] = useState<"unsupported" | "off" | "on" | "busy">(
+		"unsupported",
+	);
+
+	useEffect(() => {
+		if (!pushSupported()) return;
+		void getSubscription().then((sub) => setState(sub ? "on" : "off"));
+	}, []);
+
+	if (state === "unsupported") return null;
+
+	const toggle = async () => {
+		const prev = state;
+		setState("busy");
+		try {
+			if (prev === "on") {
+				await unsubscribePush();
+				setState("off");
+			} else {
+				await subscribePush();
+				setState("on");
+			}
+		} catch (e) {
+			alert(e instanceof Error ? e.message : "通知の設定に失敗しました");
+			setState(prev);
+		}
+	};
+
+	return (
+		<button
+			type="button"
+			className={`bell-btn ${state === "on" ? "is-on" : ""}`}
+			onClick={() => void toggle()}
+			disabled={state === "busy"}
+			aria-label={
+				state === "on" ? "おさらい通知をオフにする" : "おさらい通知をオンにする"
+			}
+			title={state === "on" ? "通知オン" : "通知オフ"}
+		>
+			<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+				<path
+					d="M12 3.5c-3 0-5 2.3-5 5.2 0 3.6-1 4.9-1.8 5.8-.3.4 0 1 .5 1h12.6c.5 0 .8-.6.5-1-.8-.9-1.8-2.2-1.8-5.8 0-2.9-2-5.2-5-5.2z"
+					fill={state === "on" ? "currentColor" : "none"}
+					stroke="currentColor"
+					strokeWidth="1.8"
+					strokeLinejoin="round"
+				/>
+				<path
+					d="M10 18.5a2 2 0 0 0 4 0"
+					fill="none"
+					stroke="currentColor"
+					strokeWidth="1.8"
+					strokeLinecap="round"
+				/>
+			</svg>
+		</button>
+	);
+}
+
 function App() {
 	const [tab, setTab] = useState<Tab>("register");
 	const [sentences, setSentences] = useState<Sentence[]>([]);
@@ -98,6 +164,7 @@ function App() {
 					復
 				</span>
 				<h1 className="app-title">osarai</h1>
+				<NotificationBell />
 			</header>
 
 			<main className="app-main">

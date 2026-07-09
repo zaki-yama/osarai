@@ -93,6 +93,28 @@ input {
 	padding-bottom: calc(84px + env(safe-area-inset-bottom));
 }
 
+.bell-btn {
+	margin-left: auto;
+	display: grid;
+	place-items: center;
+	width: 38px;
+	height: 38px;
+	border: 1.5px solid var(--line);
+	border-radius: 12px;
+	background: transparent;
+	color: var(--ink-soft);
+}
+
+.bell-btn.is-on {
+	color: var(--shu);
+	border-color: var(--shu);
+	background: var(--shu-soft);
+}
+
+.bell-btn:disabled {
+	opacity: 0.5;
+}
+
 /* ---- Screens ---- */
 
 .screen {

@@ -9,7 +9,12 @@
 	},
 	"upload_source_maps": true,
 	"vars": {
-		"GEMINI_MODEL": "gemini-2.5-flash"
+		"GEMINI_MODEL": "gemini-2.5-flash",
+		"VAPID_PUBLIC_KEY": "BOxM63XB4Wxvn1jgbfAbJUjOZnKKa6XrJXyUhBwBs8baS6AdEV-tqCmNKmHF-GebV6W8NjtEe65cb9sAmItToc8",
+		"VAPID_SUBJECT": "mailto:shingoyamazaki00@gmail.com"
+	},
+	"triggers": {
+		"crons": ["0 22 * * *"]
 	},
 	"d1_databases": [
 		{

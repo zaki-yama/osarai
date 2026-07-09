@@ -1,0 +1,23 @@
+{
+	"name": "osarai — 英会話のおさらい",
+	"short_name": "osarai",
+	"description": "英会話レッスンで学んだ文をおさらいするアプリ",
+	"lang": "ja",
+	"start_url": "/",
+	"scope": "/",
+	"display": "standalone",
+	"background_color": "#faf5ec",
+	"theme_color": "#faf5ec",
+	"icons": [
+		{
+			"src": "/icons/icon-192.png",
+			"sizes": "192x192",
+			"type": "image/png"
+		},
+		{
+			"src": "/icons/icon-512.png",
+			"sizes": "512x512",
+			"type": "image/png"
+		}
+	]
+}
