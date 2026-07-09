@@ -4,6 +4,11 @@ export interface Suggestion {
 	explanation: string;
 }
 
+export interface JudgeResult {
+	correct: boolean;
+	comment: string;
+}
+
 export interface Sentence {
 	id: number;
 	ja: string;

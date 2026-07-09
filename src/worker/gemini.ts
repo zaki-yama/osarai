@@ -1,4 +1,4 @@
-import type { Suggestion } from "../shared/types";
+import type { JudgeResult, Suggestion } from "../shared/types";
 
 const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models";
 const DEFAULT_MODEL = "gemini-2.5-flash";
@@ -85,4 +85,36 @@ ${ja}`;
 		throw new Error("Gemini API returned no suggestions");
 	}
 	return parsed.suggestions;
+}
+
+const JUDGE_SCHEMA = {
+	type: "OBJECT",
+	properties: {
+		correct: { type: "BOOLEAN" },
+		comment: { type: "STRING" },
+	},
+	required: ["correct", "comment"],
+};
+
+export async function judgeAnswer(
+	env: Env,
+	sentence: { ja: string; en: string },
+	answer: string,
+): Promise<JudgeResult> {
+	const prompt = `あなたは日本人の英会話学習者の発話を採点するコーチです。
+学習者は次の日本語の意味を英語で言う練習をしています。
+
+日本語: ${sentence.ja}
+お手本の英文: ${sentence.en}
+
+学習者の発話(音声認識で文字起こししたもの):
+${answer}
+
+採点基準:
+- お手本と一言一句同じである必要はない。日本語の意味が英語として自然に伝わっていれば正解(correct=true)
+- 音声認識による軽微な誤変換(大文字小文字・句読点・同音異義語)は減点しない
+- 意味が変わってしまう文法ミス、主要な語彙の欠落、意味の通らない文は不正解(correct=false)
+- comment には採点理由と、より良い言い方のアドバイスを日本語で1〜2文で書く`;
+
+	return generateJson<JudgeResult>(env, prompt, JUDGE_SCHEMA);
 }

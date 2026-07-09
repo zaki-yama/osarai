@@ -1,4 +1,9 @@
-import type { Sentence, Suggestion } from "../shared/types";
+import type { JudgeResult, Sentence, Suggestion } from "../shared/types";
+
+/** D1 stores UTC "YYYY-MM-DD HH:MM:SS" */
+export function parseSqliteDate(sqlite: string): Date {
+	return new Date(`${sqlite.replace(" ", "T")}Z`);
+}
 
 export class ApiError extends Error {
 	constructor(
@@ -43,6 +48,12 @@ export const api = {
 		}),
 	deleteSentence: (id: number) =>
 		request<{ ok: boolean }>(`/api/sentences/${id}`, { method: "DELETE" }),
+	reviewQueue: () => request<{ sentences: Sentence[] }>("/api/review/queue"),
+	judge: (id: number, answer: string) =>
+		request<JudgeResult & { sentence: Sentence }>(`/api/review/${id}/judge`, {
+			method: "POST",
+			body: JSON.stringify({ answer }),
+		}),
 };
 
 export function speak(text: string) {

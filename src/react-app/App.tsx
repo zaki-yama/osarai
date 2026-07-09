@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { api } from "./api";
+import { api, parseSqliteDate } from "./api";
 import { RegisterScreen } from "./screens/RegisterScreen";
 import { ListScreen } from "./screens/ListScreen";
 import { ReviewScreen } from "./screens/ReviewScreen";
@@ -86,6 +86,11 @@ function App() {
 		void refresh();
 	}, [refresh]);
 
+	const now = new Date();
+	const dueCount = sentences.filter(
+		(s) => parseSqliteDate(s.due_at) <= now,
+	).length;
+
 	return (
 		<div className="app">
 			<header className="app-header">
@@ -107,7 +112,7 @@ function App() {
 						onDeleted={() => void refresh()}
 					/>
 				)}
-				{tab === "review" && <ReviewScreen sentences={sentences} />}
+				{tab === "review" && <ReviewScreen onReviewed={() => void refresh()} />}
 			</main>
 
 			<nav className="tab-bar">
@@ -120,6 +125,9 @@ function App() {
 					>
 						{t.icon}
 						<span>{t.label}</span>
+						{t.id === "review" && dueCount > 0 && (
+							<span className="due-badge">{dueCount}</span>
+						)}
 					</button>
 				))}
 			</nav>
