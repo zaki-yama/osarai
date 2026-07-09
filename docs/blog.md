@@ -122,8 +122,10 @@ iOS で受信するには **iOS 16.4 以上 + ホーム画面に追加した PWA
 const rec = new (window.SpeechRecognition ?? window.webkitSpeechRecognition)();
 rec.lang = "en-US";
 rec.interimResults = true;  // 話しながらリアルタイムに表示
-rec.continuous = false;     // 一文話し終えたら自動停止
+rec.continuous = true;      // 話の区切りで止めない(停止はマイクの再タップ)
 ```
+
+1つ罠があって、`continuous = true` にしても音声認識エンジンは長い無音で勝手に終了することがある(特に iOS)。「英語を考えながら話す」アプリでは考えている間に切られると致命的なので、ユーザーが明示的に停止するまでは `onend` でそれまでの認識テキストを引き継いで自動再開するようにした。認識結果はそのまま編集可能なテキストエリアに入れており、惜しい誤認識はキーボードで直してから採点に送れる。
 
 TypeScript の `lib.dom` に SpeechRecognition の型が入っていないので、最小限の型定義を自前で書いている([`src/react-app/hooks/useSpeechRecognition.ts`](../src/react-app/hooks/useSpeechRecognition.ts))。iOS Safari(ホーム画面 PWA 含む)で動くことを実機確認できたが、動かない環境向けにキーボード入力へのフォールバック UI も用意した。お手本の読み上げは [SpeechSynthesis](https://developer.mozilla.org/ja/docs/Web/API/SpeechSynthesis) で、これもブラウザ標準・無料。
 
