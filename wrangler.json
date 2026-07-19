@@ -14,7 +14,7 @@
 		"VAPID_SUBJECT": "mailto:shingoyamazaki00@gmail.com"
 	},
 	"triggers": {
-		"crons": ["0 22 * * *"]
+		"crons": ["0 0 * * *"]
 	},
 	"d1_databases": [
 		{

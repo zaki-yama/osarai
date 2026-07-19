@@ -35,7 +35,7 @@
 {
   "main": "./src/worker/index.ts",
   "assets": { "directory": "./dist/client", "not_found_handling": "single-page-application" },
-  "triggers": { "crons": ["0 22 * * *"] },  // 毎朝 7:00 JST
+  "triggers": { "crons": ["0 0 * * *"] },  // 毎朝 9:00 JST
   "d1_databases": [{ "binding": "DB", "database_name": "osarai", ... }],
   "vars": { "GEMINI_MODEL": "gemini-2.5-flash", "VAPID_PUBLIC_KEY": "..." }
 }
