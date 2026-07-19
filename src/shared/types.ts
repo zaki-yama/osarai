@@ -28,4 +28,5 @@ export interface Sentence {
 	ease: number;
 	due_at: string;
 	streak: number;
+	review_count: number;
 }

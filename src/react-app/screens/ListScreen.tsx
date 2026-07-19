@@ -1,4 +1,5 @@
 import { api, speak } from "../api";
+import { MASTERY_STREAK } from "../../shared/srs";
 import type { Sentence } from "../../shared/types";
 
 function formatDate(sqlite: string) {
@@ -48,6 +49,22 @@ export function ListScreen({
 						<p className="sentence-en">{s.en}</p>
 						<p className="sentence-ja">{s.ja}</p>
 						{s.note && <p className="sentence-note">{s.note}</p>}
+						<div className="mastery-row">
+							<div className="mastery-bar">
+								<div
+									className="mastery-bar-fill"
+									style={{
+										width: `${(Math.min(s.streak, MASTERY_STREAK) / MASTERY_STREAK) * 100}%`,
+									}}
+								/>
+							</div>
+							<span className="mastery-label">
+								{Math.round(
+									(Math.min(s.streak, MASTERY_STREAK) / MASTERY_STREAK) * 100,
+								)}
+								%・復習{s.review_count}回
+							</span>
+						</div>
 						<div className="sentence-footer">
 							<span className="sentence-date">{formatDate(s.created_at)} 登録</span>
 							<span className="sentence-actions">

@@ -3,6 +3,7 @@ import { judgeAnswer, suggestTranslations } from "./gemini";
 import { sendPushToAll, sendReviewReminder } from "./push";
 import { nextSrsState } from "./srs";
 import type { JudgeResult, Sentence } from "../shared/types";
+import { MASTERY_STREAK } from "../shared/srs";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -35,7 +36,11 @@ app.post("/api/suggest", async (c) => {
 
 app.get("/api/sentences", async (c) => {
 	const { results } = await c.env.DB.prepare(
-		"SELECT * FROM sentences ORDER BY created_at DESC, id DESC",
+		`SELECT s.*, COUNT(r.id) AS review_count
+		 FROM sentences s
+		 LEFT JOIN reviews r ON r.sentence_id = s.id
+		 GROUP BY s.id
+		 ORDER BY s.created_at DESC, s.id DESC`,
 	).all<Sentence>();
 	return c.json({ sentences: results });
 });
@@ -132,8 +137,10 @@ app.post("/api/review/:id/judge", async (c) => {
 app.get("/api/stats", async (c) => {
 	const [totals, reviewTotals, activeDays, daily] = await Promise.all([
 		c.env.DB.prepare(
-			"SELECT COUNT(*) AS total, SUM(CASE WHEN streak >= 3 THEN 1 ELSE 0 END) AS mastered FROM sentences",
-		).first<{ total: number; mastered: number | null }>(),
+			"SELECT COUNT(*) AS total, SUM(CASE WHEN streak >= ? THEN 1 ELSE 0 END) AS mastered FROM sentences",
+		)
+			.bind(MASTERY_STREAK)
+			.first<{ total: number; mastered: number | null }>(),
 		c.env.DB.prepare(
 			"SELECT COUNT(*) AS total, SUM(correct) AS correct FROM reviews",
 		).first<{ total: number; correct: number | null }>(),
