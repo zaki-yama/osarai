@@ -175,6 +175,9 @@ input {
 	border: 1.5px solid var(--line);
 	border-radius: var(--radius);
 	resize: vertical;
+	/* 対応ブラウザでは内容に応じて高さを自動調整(未対応なら rows の固定の高さ) */
+	field-sizing: content;
+	max-height: 40vh;
 }
 
 .ja-input:focus,
